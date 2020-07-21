@@ -4,14 +4,13 @@ project(MuserSDL VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-include(sdl/lib/cmake/SDL2/sdl2-config.cmake)
+include_directories(sdl/include)
+link_directories(sdl/lib/x64)
+message(${PROJECT_SOURCE_DIR})
+add_executable(MuserSDL src/main.cpp)
+target_link_libraries(MuserSDL SDL2 SDL2main)
 
-include_directories(${SDL2_INCLUDE_DIRS})
-add_executable(MuserSDL main.cpp)
-
-target_include_directories(MuserSDL PUBLIC ${SDL2_INCLUDE_DIRS})
-target_link_libraries(MuserSDL ${SDL2_LIBRARIES})
-
+target_include_directories(MuserSDL PUBLIC sdl/include)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
