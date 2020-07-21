@@ -49,3 +49,9 @@ build/
 *-prefix/
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,cmake
+
+# Log file(s) of muser
+muser.txt
+
+# Test file(s) of muser
+test.txt
