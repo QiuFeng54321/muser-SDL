@@ -1,2 +1,2 @@
 # muser-SDL
-SDL Impl of muser
+This is muser with SDL implementation.
