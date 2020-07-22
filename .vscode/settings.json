@@ -37,6 +37,13 @@
         "xstddef": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "atomic": "cpp",
+        "fstream": "cpp",
+        "random": "cpp",
+        "regex": "cpp",
+        "thread": "cpp",
+        "variant": "cpp",
+        "xlocmon": "cpp"
     }
 }

@@ -1,16 +1,11 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2020)
-and may not be redistributed without written permission.*/
-
-//Using SDL and standard IO
 #include <iostream>
 
 #include "SDL.h"
 #include "logger.hpp"
 #include "resource_manager.hpp"
+#include "windows.hpp"
 
-//Screen dimension constants
-const int kScreenWidth = 256;
-const int kScreenHeight = 256;
+
 
 int main(int argc, char* args[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -19,7 +14,10 @@ int main(int argc, char* args[]) {
     }
     muser::logger::init_logger();
     muser::logger::logger.info("You are running MuserSDL v{0}", MUSER_VERSION);
-    muser::logger::logger.info("Resource path is: {0}", muser::resource::ResourceManager::getResourcePath());
+    muser::logger::logger.info("Resource path is: {0}", muser::resource::ResourceManager::GetResourcePath());
+
+    muser::windows::CreateMuserWindow();
+    muser::windows::CreateMuserRenderer();
 
     SDL_Quit();
     return 0;

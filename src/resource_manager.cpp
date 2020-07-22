@@ -1,7 +1,7 @@
 #include "resource_manager.hpp"
 
 namespace muser::resource {
-    std::string ResourceManager::getResourcePath(const std::string &subDir) {
+    std::string ResourceManager::GetResourcePath(const std::string &subDir) {
         // We need to choose the path separator properly based on which
         // platform we're running on, since Windows uses a different
         // separator than most systems

@@ -12,7 +12,7 @@ namespace muser::resource {
         /**
          * Modified from https://www.willusher.io/sdl2%20tutorials/2014/06/16/postscript-0-properly-finding-resource-paths
          */
-        static std::string getResourcePath(const std::string &subDir = "");
+        static std::string GetResourcePath(const std::string &subDir = "");
     };
 };  // namespace muser::resource
 
