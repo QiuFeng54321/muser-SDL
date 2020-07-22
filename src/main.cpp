@@ -9,8 +9,8 @@ and may not be redistributed without written permission.*/
 #include "resource_manager.hpp"
 
 //Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int kScreenWidth = 256;
+const int kScreenHeight = 256;
 
 int main(int argc, char* args[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
