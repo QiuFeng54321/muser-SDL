@@ -18,6 +18,8 @@ int main(int argc, char* args[]) {
     muser::windows::CreateMuserWindow();
     muser::windows::CreateMuserRenderer();
 
+    SDL_Delay(5000);
+
     SDL_Quit();
     return 0;
 }
