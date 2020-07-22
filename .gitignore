@@ -54,4 +54,5 @@ build/
 muser.txt
 
 # Test file(s) of muser
-test.txt
+test*.txt
+testdir*/
