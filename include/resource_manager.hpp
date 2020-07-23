@@ -14,9 +14,12 @@
 
 namespace muser::resource {
     extern std::map<std::string, std::string> temp_file_map;
+    extern bool enable_temp_file;
     std::string GetResource(const std::string &file, const std::string &fallback = "");
+    void LoadResourceToTempFile(const std::string &resource_key, const std::string &data);
     void LoadResourcesToTempFiles();
     void ReleaseTempResources();
+    void AddResource(const std::string &key, const std::string &value);
 };  // namespace muser::resource
 
 #endif
