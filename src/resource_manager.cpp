@@ -25,7 +25,8 @@ namespace muser::resource {
     }
     void ReleaseTempResources() {
         for (auto pair : temp_file_map) {
-            std::filesystem::remove(std::filesystem::path(pair.second));
+            remove(pair.second.c_str());
+            // std::filesystem::remove(std::filesystem::path(pair.second));
         }
     }
 

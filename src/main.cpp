@@ -19,7 +19,10 @@ int main(int argc, char* args[]) {
     muser::windows::CreateMuserWindow();
     muser::windows::CreateMuserRenderer();
     
+    muser::resource::InitResources();
     muser::resource::LoadResourcesToTempFiles();
+
+    muser::logger::logger->warn(muser::resource::GetResource("hi.txt", "None"));
 
     SDL_Delay(5000);
 

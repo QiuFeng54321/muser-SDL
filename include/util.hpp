@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <string>
-#include <filesystem>
 
 namespace muser::util {
     std::string random_template_file();

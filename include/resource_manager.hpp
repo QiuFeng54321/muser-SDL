@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <cstdio>
 #include "resource.hpp"
 #include "util.hpp"
 #include "logger.hpp"

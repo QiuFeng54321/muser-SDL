@@ -6,15 +6,8 @@ set(EMBED_RESOURCE_SOURCE "src/resource.cpp")
 
 #Write the resource source
 
-file(WRITE ${EMBED_RESOURCE_SOURCE} 
-"\
-#include \"resource.hpp\"\n\
-namespace muser::resource{\n\
-    std::map<std::string, std::string> resources{\n\t\t\
-")
-
-include(CTest)
-enable_testing()
+# include(CTest)
+# enable_testing()
 
 add_subdirectory(spdlog)
 
@@ -26,48 +19,71 @@ message(${PROJECT_SOURCE_DIR})
 aux_source_directory(src MUSER_SOURCE_FILES)
 aux_source_directory(include MUSER_INCLUDE_FILES)
 
-# Generate resource.cpp
-get_filename_component(MUSER_RESOURCE_ABSOLUTE_PATH res ABSOLUTE)
-file(GLOB_RECURSE MUSER_RESOURCE_FILES_ABS res/*)
-message("Abs files: ${MUSER_RESOURCE_FILES_ABS}")
-foreach(ABS_RES_FILE ${MUSER_RESOURCE_FILES_ABS})
-    
-    file(RELATIVE_PATH MUSER_RESOURCE_FILE_NAME ${MUSER_RESOURCE_ABSOLUTE_PATH} ${ABS_RES_FILE})
-    # string(REGEX REPLACE "/|\\." "_" RESOURCE_NAME ${MUSER_RESOURCE_FILE_NAME})
-    message("Resource file found: ${ABS_RES_FILE} -> key ${MUSER_RESOURCE_FILE_NAME}")
-
-    # Read the resource file and convert its info to a hex string
-    file(READ "${ABS_RES_FILE}" RES_INFO HEX)
-    string(LENGTH "${RES_INFO}" RES_INFO_HEX_LENGTH)
-    math(EXPR RES_INFO_LENGTH "${RES_INFO_HEX_LENGTH} / 2")
-
-    # Group the string by 2 bytes
-    foreach(INDEX RANGE 0 ${RES_INFO_HEX_LENGTH} 2)
-        string(SUBSTRING "${RES_INFO}" ${INDEX} 2 GROUPED)
-        list(APPEND GROUPED_RES_INFO "0x${GROUPED}")
-    endforeach()
-
-    # Create a declaration in C++
-    string(REPLACE ";" "," RESOURCE_INFO_CHAR_LIST "{${GROUPED_RES_INFO}}")
-    string(REPLACE ",0x}" "}" RESOURCE_INFO_CHAR_LIST "${RESOURCE_INFO_CHAR_LIST}")
-    list(APPEND RESOURCE_LIST "{\"${MUSER_RESOURCE_FILE_NAME}\", std::string(new char[${RES_INFO_LENGTH}]${RESOURCE_INFO_CHAR_LIST})}")
-
-    list(APPEND MUSER_RESOURCE_FILES ${MUSER_RESOURCE_FILE_NAME})
-    set(GROUPED_RES_INFO)
-    set(GROUPED)
-endforeach()
-
-string(REPLACE ";" ",\n\t\t" RESOURCE_LIST "${RESOURCE_LIST}")
-file(APPEND "${EMBED_RESOURCE_SOURCE}" "${RESOURCE_LIST}")
-file(APPEND "${EMBED_RESOURCE_SOURCE}" "\n\t};\n}")
-
 message("Resource files: ${MUSER_RESOURCE_FILES}")
 
 add_compile_definitions(MUSER_VERSION="${MUSER_VERSION}")
 
-add_executable(MuserSDL ${MUSER_SOURCE_FILES} ${MUSER_INCLUDE_FILES})
+add_executable(MuserSDL ${MUSER_SOURCE_FILES} ${MUSER_INCLUDE_FILES} $<TARGET_OBJECTS:muser_resources>)
+add_library(muser_resources OBJECT IMPORTED GLOBAL)
+set_property(TARGET muser_resources PROPERTY IMPORTED_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
+SET_TARGET_PROPERTIES(
+  muser_resources
+  PROPERTIES
+  LINKER_LANGUAGE C 
+  )
 
 set_property(TARGET MuserSDL PROPERTY CXX_STANDARD 17)
+
+# Generate resource.cpp
+get_filename_component(MUSER_RESOURCE_ABSOLUTE_PATH res ABSOLUTE)
+file(GLOB_RECURSE MUSER_RESOURCE_FILES_ABS res/*)
+message("Abs files: ${MUSER_RESOURCE_FILES_ABS}")
+
+file(WRITE "${EMBED_RESOURCE_SOURCE}" "\
+#include \"resource.hpp\"\n")
+foreach(ABS_RES_FILE ${MUSER_RESOURCE_FILES_ABS})
+    file(RELATIVE_PATH MUSER_RESOURCE_FILE_NAME ${PROJECT_SOURCE_DIR}/build ${ABS_RES_FILE})
+    file(RELATIVE_PATH MUSER_RESOURCE_KEY_NAME ${MUSER_RESOURCE_ABSOLUTE_PATH} ${ABS_RES_FILE})
+    message("Resource file found: ${ABS_RES_FILE} -> key ${MUSER_RESOURCE_FILE_NAME}")
+    set(RESOURCE_OUTPUT_FILE ${MUSER_RESOURCE_FILE_NAME}.o)
+    string(REGEX REPLACE "/|\\." "_"  MUSER_RESOURCE_NAME "${MUSER_RESOURCE_FILE_NAME}")
+    if(APPLE)
+        target_compile_options(MuserSDL PRIVATE -sectcreate __DATA __${MUSER_RESOURCE_NAME} ${MUSER_RESOURCE_FILE_NAME})
+    else()
+        message("$<TARGET_FILE:MuserSDL>")
+        # target_link_options(MuserSDL BEFORE PRIVATE -r -b binary ${ABS_RES_FILE})
+        
+    endif()
+    file(APPEND "${EMBED_RESOURCE_SOURCE}" "EXTLD(${MUSER_RESOURCE_NAME});\n\t")
+    list(APPEND MUSER_RESOURCE_INIT_FN "\
+resources.insert_or_assign(\"${MUSER_RESOURCE_KEY_NAME}\", \n\t\t\t\
+std::string(reinterpret_cast<const char*>(LDVAR(${MUSER_RESOURCE_NAME})),static_cast<int>(LDLEN(${MUSER_RESOURCE_NAME}))))?\n\t\t")
+    list(APPEND MUSER_RESOURCE_FILES "${MUSER_RESOURCE_FILE_NAME}")
+endforeach()
+
+if(NOT APPLE)
+    add_custom_command(
+            PRE_LINK
+            TARGET MuserSDL
+            COMMAND ld -r -b binary -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o ${MUSER_RESOURCE_FILES}
+            COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents ${CMAKE_CURRENT_BINARY_DIR}/resource.o ${CMAKE_CURRENT_BINARY_DIR}/resource.o
+            COMMENT "Adding resource files...")
+endif()
+
+
+file(APPEND "${EMBED_RESOURCE_SOURCE}" "
+namespace muser::resource {\n\
+\tdecltype(resources) resources;\n\t\
+")
+string(REPLACE ";" "" MUSER_RESOURCE_INIT_FN "${MUSER_RESOURCE_INIT_FN}")
+string(REPLACE "?" ";" MUSER_RESOURCE_INIT_FN "${MUSER_RESOURCE_INIT_FN}")
+file(APPEND "${EMBED_RESOURCE_SOURCE}" "\
+void InitResources() {\n\t\t")
+file(APPEND "${EMBED_RESOURCE_SOURCE}" "${MUSER_RESOURCE_INIT_FN}")
+file(APPEND "${EMBED_RESOURCE_SOURCE}" "\n\t\
+}\n\
+}\n\
+")
 
 target_link_libraries(MuserSDL SDL2 SDL2main spdlog)
 target_include_directories(MuserSDL PUBLIC sdl/include include spdlog/include/spdlog)
