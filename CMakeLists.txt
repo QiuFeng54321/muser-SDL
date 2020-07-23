@@ -37,12 +37,11 @@ foreach(ABS_RES_FILE ${MUSER_RESOURCE_FILES_ABS})
     message("Resource file found: ${ABS_RES_FILE} -> key ${MUSER_RESOURCE_FILE_NAME}")
 
     # Read the resource file and convert its info to a hex string
-    file(READ "${ABS_RES_FILE}" RES_INFO)
-    string(LENGTH "${RES_INFO}" RES_INFO_LENGTH)
-    string(HEX "${RES_INFO}" RES_INFO)
+    file(READ "${ABS_RES_FILE}" RES_INFO HEX)
+    string(LENGTH "${RES_INFO}" RES_INFO_HEX_LENGTH)
+    math(EXPR RES_INFO_LENGTH "${RES_INFO_HEX_LENGTH} / 2")
 
     # Group the string by 2 bytes
-    string(LENGTH "${RES_INFO}" RES_INFO_HEX_LENGTH)
     foreach(INDEX RANGE 0 ${RES_INFO_HEX_LENGTH} 2)
         string(SUBSTRING "${RES_INFO}" ${INDEX} 2 GROUPED)
         list(APPEND GROUPED_RES_INFO "0x${GROUPED}")
