@@ -2,11 +2,18 @@
 
 namespace muser::resource {
     std::map<std::string, std::string> temp_file_map;
+    std::map<std::string, SDL_Surface*> surface_buffer;
     bool enable_temp_file = true;
     std::string GetResource(const std::string &file_path, const std::string &fallback) {
         // Returns the resource data given the resource path
         auto result = resources.find(file_path);
         if (result != resources.end()) return result->second;
+        return fallback;
+    }
+
+    SDL_Surface *GetSurface(const std::string &key, SDL_Surface *fallback) {
+        auto result = surface_buffer.find(key);
+        if (result != surface_buffer.end()) return result->second;
         return fallback;
     }
 
@@ -21,6 +28,23 @@ namespace muser::resource {
     void LoadResourcesToTempFiles() {
         for (auto pair : resources) {
             LoadResourceToTempFile(pair.first, pair.second);
+        }
+    }
+
+    void LoadBMP(const std::string &key, const std::string &data) {
+        SDL_RWops *rw = SDL_RWFromConstMem(data.c_str(), data.size());
+        SDL_Surface *img = SDL_LoadBMP_RW(rw, 1);
+        surface_buffer.insert_or_assign(key, img);
+    }
+
+    void LoadBMPs() {
+        for (auto pair : resources) {
+            auto ext_i = pair.first.rfind('.');
+            if(ext_i != std::string::npos) {
+                if(auto ext = pair.first.substr(ext_i + 1); ext == "bmp") {
+                    LoadBMP(pair.first, pair.second);
+                }
+            }
         }
     }
 

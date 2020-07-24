@@ -21,9 +21,10 @@ int main(int argc, char* args[]) {
     muser::windows::CreateMuserRenderer();
 
     muser::resource::InitResources();
+    muser::resource::LoadBMPs();
     muser::resource::LoadResourcesToTempFiles();
 
-    auto texture = muser::windows::UploadToTexture(muser::windows::LoadBMP(muser::resource::GetTempFile("muser_resources.bmp")));
+    auto texture = muser::windows::UploadToTexture(muser::resource::GetSurface("muser_resources.bmp"));
     SDL_RenderClear(muser::windows::renderer);
     SDL_RenderCopy(muser::windows::renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(muser::windows::renderer);
