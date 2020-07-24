@@ -25,6 +25,7 @@ add_compile_definitions(MUSER_VERSION="${MUSER_VERSION}")
 
 add_executable(MuserSDL ${MUSER_SOURCE_FILES} ${MUSER_INCLUDE_FILES} $<TARGET_OBJECTS:muser_resources>)
 add_library(muser_resources OBJECT IMPORTED GLOBAL)
+file(TOUCH "${CMAKE_CURRENT_BINARY_DIR}/resource.o")
 set_property(TARGET muser_resources PROPERTY IMPORTED_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
 SET_TARGET_PROPERTIES(
   muser_resources
@@ -35,6 +36,7 @@ SET_TARGET_PROPERTIES(
 set_property(TARGET MuserSDL PROPERTY CXX_STANDARD 17)
 
 # Generate resource.cpp
+if(0)
 get_filename_component(MUSER_RESOURCE_ABSOLUTE_PATH res ABSOLUTE)
 file(GLOB_RECURSE MUSER_RESOURCE_FILES_ABS res/*)
 message("Abs files: ${MUSER_RESOURCE_FILES_ABS}")
@@ -85,6 +87,7 @@ file(APPEND "${EMBED_RESOURCE_SOURCE}" "\n\t\
 }\n\
 }\n\
 ")
+endif()
 
 target_link_libraries(MuserSDL SDL2 SDL2main spdlog)
 target_include_directories(MuserSDL PUBLIC sdl/include include spdlog/include/spdlog)

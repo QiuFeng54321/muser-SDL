@@ -23,6 +23,15 @@ namespace muser::resource {
             LoadResourceToTempFile(pair.first, pair.second);
         }
     }
+
+    std::string GetTempFile(const std::string &key) {
+        auto result = temp_file_map.find(key);
+        if(result == temp_file_map.end()) {
+            throw std::runtime_error("Attempting to get a temp file of a non-existant key");
+        }
+        return result->second;
+    }
+
     void ReleaseTempResources() {
         for (auto pair : temp_file_map) {
             remove(pair.second.c_str());

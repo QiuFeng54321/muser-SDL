@@ -19,6 +19,7 @@ namespace muser::resource {
     std::string GetResource(const std::string &file, const std::string &fallback = "");
     void LoadResourceToTempFile(const std::string &resource_key, const std::string &data);
     void LoadResourcesToTempFiles();
+    std::string GetTempFile(const std::string &key);
     void ReleaseTempResources();
     void AddResource(const std::string &key, const std::string &value);
 };  // namespace muser::resource

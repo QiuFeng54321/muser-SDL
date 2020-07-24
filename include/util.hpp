@@ -2,6 +2,7 @@
 #define UTIL_HPP
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string>
 
 namespace muser::util {
