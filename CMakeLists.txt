@@ -47,6 +47,7 @@ foreach(ABS_RES_FILE ${MUSER_RESOURCE_FILES_ABS})
     message("Resource file found: ${ABS_RES_FILE} -> key ${MUSER_RESOURCE_FILE_NAME}")
     set(RESOURCE_OUTPUT_FILE ${MUSER_RESOURCE_FILE_NAME}.o)
     string(REGEX REPLACE "/|\\." "_"  MUSER_RESOURCE_NAME "${MUSER_RESOURCE_FILE_NAME}")
+    # http://gareus.org/wiki/embedding_resources_in_executables#architecture_abstraction_--_working_solution
     if(APPLE)
         target_compile_options(MuserSDL PRIVATE -sectcreate __DATA __${MUSER_RESOURCE_NAME} ${MUSER_RESOURCE_FILE_NAME})
     else()
