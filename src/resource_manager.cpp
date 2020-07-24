@@ -4,7 +4,8 @@ namespace muser::resource {
     std::map<std::string, std::string> temp_file_map;
     std::map<std::string, SDL_Surface*> surface_buffer;
     bool enable_temp_file = true;
-    std::string GetResource(const std::string &file_path, const std::string &fallback) {
+
+    ResourceEntry GetResource(const std::string &file_path, const ResourceEntry &fallback) {
         // Returns the resource data given the resource path
         auto result = resources.find(file_path);
         if (result != resources.end()) return result->second;
@@ -18,9 +19,13 @@ namespace muser::resource {
     }
 
     void LoadResourceToTempFile(const std::string &resource_key, const std::string &data) {
+        LoadResourceToTempFile(resource_key, ResourceEntry{data.c_str(), data.size()});
+    }
+
+    void LoadResourceToTempFile(const std::string &resource_key, const ResourceEntry &data) {
         auto path = util::random_template_file();
         auto file = std::ofstream(path);
-        file.write(data.c_str(), data.size());
+        file.write(data.start, data.length);
         file.close();
         temp_file_map.insert_or_assign(resource_key, path);
     }
@@ -32,7 +37,11 @@ namespace muser::resource {
     }
 
     void LoadBMP(const std::string &key, const std::string &data) {
-        SDL_RWops *rw = SDL_RWFromConstMem(data.c_str(), data.size());
+        LoadBMP(key, ResourceEntry{data.c_str(), data.size()});
+    }
+
+    void LoadBMP(const std::string &key, const ResourceEntry &data) {
+        SDL_RWops *rw = SDL_RWFromConstMem(data.start, data.length);
         SDL_Surface *img = SDL_LoadBMP_RW(rw, 1);
         surface_buffer.insert_or_assign(key, img);
     }
@@ -64,6 +73,10 @@ namespace muser::resource {
     }
 
     void AddResource(const std::string &key, const std::string &value) {
+        AddResource(key, ResourceEntry{value.c_str(), value.size()});
+    }
+
+    void AddResource(const std::string &key, const ResourceEntry &value) {
         resources.insert_or_assign(key, value);
         if(enable_temp_file) {
             LoadResourceToTempFile(key, value);

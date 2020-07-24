@@ -27,6 +27,12 @@ add_executable(MuserSDL ${MUSER_SOURCE_FILES} ${MUSER_INCLUDE_FILES} $<TARGET_OB
 add_library(muser_resources OBJECT IMPORTED GLOBAL)
 file(TOUCH "${CMAKE_CURRENT_BINARY_DIR}/resource.o")
 set_property(TARGET muser_resources PROPERTY IMPORTED_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
+SET_SOURCE_FILES_PROPERTIES(
+    ${CMAKE_CURRENT_BINARY_DIR}/resource.o
+    PROPERTIES
+    EXTERNAL_OBJECT true
+    GENERATED true
+    )
 SET_TARGET_PROPERTIES(
   muser_resources
   PROPERTIES
@@ -36,7 +42,7 @@ SET_TARGET_PROPERTIES(
 set_property(TARGET MuserSDL PROPERTY CXX_STANDARD 17)
 
 # Generate resource.cpp
-if(0)
+if(1)
 get_filename_component(MUSER_RESOURCE_ABSOLUTE_PATH res ABSOLUTE)
 file(GLOB_RECURSE MUSER_RESOURCE_FILES_ABS res/*)
 message("Abs files: ${MUSER_RESOURCE_FILES_ABS}")
@@ -60,7 +66,7 @@ foreach(ABS_RES_FILE ${MUSER_RESOURCE_FILES_ABS})
     file(APPEND "${EMBED_RESOURCE_SOURCE}" "EXTLD(${MUSER_RESOURCE_NAME});\n\t")
     list(APPEND MUSER_RESOURCE_INIT_FN "\
 resources.insert_or_assign(\"${MUSER_RESOURCE_KEY_NAME}\", \n\t\t\t\
-std::string(reinterpret_cast<const char*>(LDVAR(${MUSER_RESOURCE_NAME})),static_cast<int>(LDLEN(${MUSER_RESOURCE_NAME}))))?\n\t\t")
+ResourceEntry{reinterpret_cast<const char*>(LDVAR(${MUSER_RESOURCE_NAME})),static_cast<len_t>(LDLEN(${MUSER_RESOURCE_NAME}))})?\n\t\t")
     list(APPEND MUSER_RESOURCE_FILES "${MUSER_RESOURCE_FILE_NAME}")
 endforeach()
 
@@ -70,6 +76,7 @@ if(NOT APPLE)
             TARGET MuserSDL
             COMMAND ld -r -b binary -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o ${MUSER_RESOURCE_FILES}
             COMMAND objcopy --rename-section .data=.rodata,alloc,load,readonly,data,contents ${CMAKE_CURRENT_BINARY_DIR}/resource.o ${CMAKE_CURRENT_BINARY_DIR}/resource.o
+            COMMAND echo "${MUSER_RESOURCE_FILES} compiled to ${CMAKE_CURRENT_BINARY_DIR}/resource.o"
             COMMENT "Adding resource files...")
 endif()
 
@@ -93,6 +100,7 @@ target_link_libraries(MuserSDL SDL2 SDL2main spdlog)
 target_include_directories(MuserSDL PUBLIC sdl/include include spdlog/include/spdlog)
 
 add_custom_command(TARGET MuserSDL POST_BUILD
+    COMMAND echo "MuserSDL Target Dir: $<TARGET_FILE_DIR:MuserSDL>"
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/sdl/lib/x64"
         $<TARGET_FILE_DIR:MuserSDL>)
