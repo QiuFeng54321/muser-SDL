@@ -26,10 +26,25 @@ int main(int argc, char* args[]) {
 
     auto texture = muser::windows::UploadToTexture(muser::resource::GetSurface("muser_resources.bmp"));
     SDL_RenderClear(muser::windows::renderer);
-    SDL_RenderCopy(muser::windows::renderer, texture, nullptr, nullptr);
+    muser::windows::RenderTexture(texture, 0, 0, new SDL_Rect{0, 0, 16, 16});
     SDL_RenderPresent(muser::windows::renderer);
 
-    SDL_Delay(5000);
+    SDL_Event e;
+    bool quit = false;
+    while (!quit) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+                muser::logger::logger->debug("User requested a quit.");
+            } else if (e.type == SDL_KEYDOWN) {
+                muser::logger::logger->info("User pressed '{}'", SDL_GetKeyName(e.key.keysym.sym));
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
+                    quit = true;
+                    muser::logger::logger->debug("User pressed <Esc> to quit.");
+                }
+            }
+        }
+    }
 
     muser::resource::ReleaseTempResources();
     SDL_Quit();

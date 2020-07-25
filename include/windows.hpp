@@ -1,6 +1,9 @@
 #ifndef WINDOWS_HPP
 #define WINDOWS_HPP
 
+#define STRETCH_SCREEN_SIZE -1
+#define TEXTURE_SIZE 0
+
 #include "SDL.h"
 #include <iostream>
 
@@ -14,6 +17,13 @@ namespace muser::windows {
     int CreateMuserRenderer();
     SDL_Surface* LoadBMP(std::string path);
     SDL_Texture* UploadToTexture(SDL_Surface* bmp);
+    void RenderTexture(SDL_Texture* tex, SDL_Rect dst,
+                       SDL_Rect* clip = nullptr, SDL_Renderer* ren = renderer);
+    void RenderTexture(SDL_Texture* tex, int x = 0, int y = 0,
+                        SDL_Rect* clip = nullptr, SDL_Renderer* ren = renderer);
+    void RenderTexture(SDL_Texture* tex, int x = 0, int y = 0, 
+                        int w = TEXTURE_SIZE, int h = TEXTURE_SIZE,
+                        SDL_Rect* clip = nullptr, SDL_Renderer* ren = renderer);
 }  // namespace muser::windows
 
 #endif
