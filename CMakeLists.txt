@@ -23,7 +23,9 @@ message("Resource files: ${MUSER_RESOURCE_FILES}")
 
 add_compile_definitions(MUSER_VERSION="${MUSER_VERSION}")
 
-add_executable(MuserSDL ${MUSER_SOURCE_FILES} ${MUSER_INCLUDE_FILES} $<TARGET_OBJECTS:muser_resources>)
+add_executable(MuserSDL 
+    ${MUSER_SOURCE_FILES} ${MUSER_INCLUDE_FILES}
+    $<TARGET_OBJECTS:muser_resources>)
 add_library(muser_resources OBJECT IMPORTED GLOBAL)
 file(TOUCH "${CMAKE_CURRENT_BINARY_DIR}/resource.o")
 set_property(TARGET muser_resources PROPERTY IMPORTED_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
@@ -97,7 +99,7 @@ file(APPEND "${EMBED_RESOURCE_SOURCE}" "\n\t\
 endif()
 
 target_link_libraries(MuserSDL SDL2 SDL2main spdlog)
-target_include_directories(MuserSDL PUBLIC sdl/include include spdlog/include/spdlog)
+target_include_directories(MuserSDL PUBLIC sdl/include include spdlog/include/spdlog visit_struct/include/visit_struct)
 
 add_custom_command(TARGET MuserSDL POST_BUILD
     COMMAND echo "MuserSDL Target Dir: $<TARGET_FILE_DIR:MuserSDL>"
