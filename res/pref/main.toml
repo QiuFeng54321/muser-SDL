@@ -1,0 +1,20 @@
+[video]
+fps = 60
+full_screen = false
+music_offset = 0
+
+[control]
+gameplay = [
+    119, 115, 97, 100, # W S A D
+    105, 107, 106, 108, # I K J L
+]
+
+[control.basic]
+select_left = 1073741904 # "Left"
+select_right = 1073741903 # "Right"
+harder_level = 1073741906 # "Up"
+easier_level = 1073741905 # "Down"
+enter_level = 32 # "Space"
+pause = 112 # "P"
+skip = 0 # "Enter"
+quit = 27 # "Escape"

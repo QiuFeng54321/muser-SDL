@@ -3,6 +3,7 @@
 
 #include "SDL.h"
 #include "logger.hpp"
+#include "preference.hpp"
 #include "resource.hpp"
 #include "resource_manager.hpp"
 #include "util.hpp"
@@ -24,6 +25,8 @@ int main(int argc, char* args[]) {
     muser::resource::LoadBMPs();
     muser::resource::LoadResourcesToTempFiles();
 
+    muser::preference::InitPreferences();
+
     auto texture = muser::windows::UploadToTexture(muser::resource::GetSurface("muser_resources.bmp"));
     SDL_RenderClear(muser::windows::renderer);
     muser::windows::RenderTexture(texture, 0, 0, new SDL_Rect{0, 0, 16, 16});
@@ -31,6 +34,7 @@ int main(int argc, char* args[]) {
 
     SDL_Event e;
     bool quit = false;
+    auto quit_key = muser::preference::GetBasicControl("quit");
     while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -38,14 +42,15 @@ int main(int argc, char* args[]) {
                 muser::logger::logger->debug("User requested a quit.");
             } else if (e.type == SDL_KEYDOWN) {
                 muser::logger::logger->info("User pressed '{}'", SDL_GetKeyName(e.key.keysym.sym));
-                if (e.key.keysym.sym == SDLK_ESCAPE) {
+                if (e.key.keysym.sym == quit_key) {
                     quit = true;
-                    muser::logger::logger->debug("User pressed <Esc> to quit.");
+                    muser::logger::logger->debug("User pressed {} to quit.", SDL_GetKeyName(quit_key));
                 }
             }
         }
     }
 
+    muser::preference::SavePreferences();
     muser::resource::ReleaseTempResources();
     SDL_Quit();
     return 0;
