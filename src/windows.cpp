@@ -1,8 +1,6 @@
 #include <windows.hpp>
 
 namespace muser::windows {
-    const int kScreenWidth = 256;
-    const int kScreenHeight = 256;
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
 
@@ -119,4 +117,5 @@ namespace muser::windows {
         }
         RenderTexture(tex, dst, clip, ren);
     }
+
 }  // namespace muser::windows
