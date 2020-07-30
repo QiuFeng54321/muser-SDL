@@ -27,14 +27,16 @@ int main(int argc, char* args[]) {
 
     muser::preference::InitPreferences();
 
+    constexpr muser::windows::CenteredMarginS<160, 32> TextureDim;
+    muser::logger::logger->warn("{}, {}", TextureDim.x, TextureDim.y);
+
     auto texture = muser::windows::UploadToTexture(muser::resource::GetSurface("muser_resources.bmp"));
-    SDL_RenderClear(muser::windows::renderer);
-    muser::windows::RenderTexture(texture, 0, 0, new SDL_Rect{0, 0, 16, 16});
-    SDL_RenderPresent(muser::windows::renderer);
+    SDL_SetTextureColorMod(texture, 64, 64, 64);
 
     SDL_Event e;
     bool quit = false;
     auto quit_key = muser::preference::GetBasicControl("quit");
+    int alpha_r = 0, alpha_g = 0, alpha_b = 0;
     while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -48,6 +50,21 @@ int main(int argc, char* args[]) {
                 }
             }
         }
+        SDL_RenderClear(muser::windows::renderer);
+        if (alpha_r < 255) {
+            alpha_r += 16;
+        } else if (alpha_g < 255) {
+            alpha_g += 16;
+        } else if (alpha_b < 255) {
+            alpha_b += 16;
+        }
+        alpha_r = muser::util::constrain(alpha_r, 0, 255);
+        alpha_g = muser::util::constrain(alpha_g, 0, 255);
+        alpha_b = muser::util::constrain(alpha_b, 0, 255);
+        SDL_SetTextureColorMod(texture, alpha_r, alpha_g, alpha_b);
+        muser::windows::RenderTexture(texture, TextureDim.x, TextureDim.y, 160, 32, new SDL_Rect{0, 64, 80, 16});
+        SDL_RenderPresent(muser::windows::renderer);
+        SDL_Delay(50);
     }
 
     muser::preference::SavePreferences();
