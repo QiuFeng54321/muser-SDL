@@ -26,20 +26,10 @@ add_compile_definitions(MUSER_VERSION="${MUSER_VERSION}")
 add_executable(MuserSDL 
     ${MUSER_SOURCE_FILES} ${MUSER_INCLUDE_FILES}
     $<TARGET_OBJECTS:muser_resources>)
+
 add_library(muser_resources OBJECT IMPORTED GLOBAL)
 file(TOUCH "${CMAKE_CURRENT_BINARY_DIR}/resource.o")
 set_property(TARGET muser_resources PROPERTY IMPORTED_OBJECTS ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
-SET_SOURCE_FILES_PROPERTIES(
-    ${CMAKE_CURRENT_BINARY_DIR}/resource.o
-    PROPERTIES
-    EXTERNAL_OBJECT true
-    GENERATED true
-    )
-SET_TARGET_PROPERTIES(
-  muser_resources
-  PROPERTIES
-  LINKER_LANGUAGE C 
-  )
 
 set_property(TARGET MuserSDL PROPERTY CXX_STANDARD 17)
 
