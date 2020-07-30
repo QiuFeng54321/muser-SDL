@@ -4,6 +4,11 @@ namespace muser::windows {
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
 
+    /**
+     * @brief Initiates SDL_Window* for muser::windows::window and shows it.
+     * 
+     * @return int 1 if failed otherwise 0
+     */
     int CreateMuserWindow() {
         window = SDL_CreateWindow("Muser", 0, 0, kScreenWidth, kScreenHeight, SDL_WINDOW_SHOWN);
         if (window == nullptr) {
@@ -14,6 +19,11 @@ namespace muser::windows {
         return 0;
     }
 
+    /**
+     * @brief Initiates SDL_Renderer* for muser::windows::renderer
+     * 
+     * @return int 0 if success else 1
+     */
     int CreateMuserRenderer() {
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         if (renderer == nullptr) {
@@ -25,6 +35,12 @@ namespace muser::windows {
         return 0;
     }
 
+    /**
+     * @brief Uses SDL_LoadBMP to load a bmp file into an SDL_Surface*
+     * Prints error and quits if fail
+     * @param path path to bmp
+     * @return SDL_Surface* bmp loaded 
+     */
     SDL_Surface* LoadBMP(std::string path) {
         SDL_Surface* bmp = SDL_LoadBMP(path.c_str());
         if (bmp == nullptr) {
