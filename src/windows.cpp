@@ -5,7 +5,7 @@ namespace muser::windows {
     SDL_Renderer* renderer = nullptr;
 
     int CreateMuserWindow() {
-        window = SDL_CreateWindow("Hello World!", 0, 0, kScreenWidth, kScreenHeight, SDL_WINDOW_SHOWN);
+        window = SDL_CreateWindow("Muser", 0, 0, kScreenWidth, kScreenHeight, SDL_WINDOW_SHOWN);
         if (window == nullptr) {
             std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
             SDL_Quit();
