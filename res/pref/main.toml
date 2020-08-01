@@ -7,6 +7,7 @@ music_offset = 0
 gameplay = [
     119, 115, 97, 100, # W S A D
     105, 107, 106, 108, # I K J L
+    116, 121, 103, 104 # T Y G H
 ]
 
 [control.basic]

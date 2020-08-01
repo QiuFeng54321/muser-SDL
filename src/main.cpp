@@ -8,6 +8,7 @@
 #include "resource_manager.hpp"
 #include "util.hpp"
 #include "windows.hpp"
+#include "event_controller.hpp"
 
 int main(int argc, char* args[]) {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -28,10 +29,12 @@ int main(int argc, char* args[]) {
 
     muser::preference::InitPreferences();
 
+    muser::event::TestEventController().Call();
+
     constexpr muser::windows::CenteredMarginS<80, 16> TextureDim;
     muser::logger::logger->warn("{}, {}", TextureDim.x, TextureDim.y);
 
-    auto texture = muser::windows::UploadToTexture(muser::resource::GetSurface("muser_resources.bmp"));
+    auto texture = muser::windows::UploadToTexture(muser::resource::GetSurface("muser_resources_ut.bmp"));
 
     SDL_Event e;
     bool quit = false;
@@ -62,23 +65,25 @@ int main(int argc, char* args[]) {
         alpha_g = muser::util::constrain(alpha_g, 0, 255);
         alpha_b = muser::util::constrain(alpha_b, 0, 255);
         SDL_SetTextureColorMod(texture, alpha_r, alpha_g, alpha_b);
-        using namespace muser::windows;
         //Make a target texture to render too
-        SDL_Texture* texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
-                                                   SDL_TEXTUREACCESS_TARGET, kWindowWidth, kWindowHeight);
+        SDL_Texture* texTarget = SDL_CreateTexture(muser::windows::renderer, SDL_PIXELFORMAT_RGBA8888,
+                                                   SDL_TEXTUREACCESS_TARGET, 
+                                                   muser::windows::kWindowWidth, muser::windows::kWindowHeight);
 
         //Now render to the texture
-        SDL_SetRenderTarget(renderer, texTarget);
-        SDL_RenderClear(renderer);
+        SDL_SetRenderTarget(muser::windows::renderer, texTarget);
+        SDL_RenderClear(muser::windows::renderer);
+        // ------------------------ Start rendering the texture ------------------------ //
         muser::windows::RenderTexture(texture,
                                       TextureDim.x, TextureDim.y,
                                       TextureDim.width, TextureDim.height,
-                                      new SDL_Rect{0, 64, 80, 16},
+                                      new SDL_Rect{0, 48, 80, 16},
                                       muser::windows::renderer,
                                       0);
-        //Detach the texture
-        SDL_SetRenderTarget(renderer, NULL);
-        
+        // ------------------------ Stop rendering the texture  ------------------------ //
+        // Detach the texture
+        SDL_SetRenderTarget(muser::windows::renderer, NULL);
+        // Render whole texture scaled to the displayer
         muser::windows::RenderTexture(texTarget,
                                       muser::windows::display_map_x, muser::windows::display_map_y,
                                       muser::windows::display_map_size, muser::windows::display_map_size);
