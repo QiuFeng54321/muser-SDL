@@ -3,6 +3,17 @@
 namespace muser::windows {
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
+    SDL_DisplayMode display;
+    int display_map_size;
+    int display_map_x;
+    int display_map_y;
+
+    void Init() {
+        SDL_GetCurrentDisplayMode(0, &display);
+        display_map_size = std::min(display.w, display.h);
+        display_map_x = display.w > display.h ? display.w / 2 - display_map_size / 2 : 0;
+        display_map_y = display.h > display.w ? display.h / 2 - display_map_size / 2 : 0;
+    }
 
     /**
      * @brief Initiates SDL_Window* for muser::windows::window and shows it.
@@ -10,7 +21,7 @@ namespace muser::windows {
      * @return int 1 if failed otherwise 0
      */
     int CreateMuserWindow() {
-        window = SDL_CreateWindow("Muser", 0, 0, kScreenWidth, kScreenHeight, SDL_WINDOW_SHOWN);
+        window = SDL_CreateWindow("Muser", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, kWindowWidth, kWindowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN_DESKTOP);
         if (window == nullptr) {
             std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
             SDL_Quit();
@@ -73,8 +84,9 @@ namespace muser::windows {
     *		default of nullptr draws the entire texture
     */
     void RenderTexture(SDL_Texture* tex, SDL_Rect dst,
-                       SDL_Rect* clip, SDL_Renderer* ren) {
-        SDL_RenderCopy(ren, tex, clip, &dst);
+                       SDL_Rect* clip, SDL_Renderer* ren,
+                       double degree, SDL_RendererFlip flip) {
+        SDL_RenderCopyEx(ren, tex, clip, &dst, degree, nullptr, flip);
     }
 
     /**
@@ -90,7 +102,8 @@ namespace muser::windows {
     *		default of nullptr draws the entire texture
     */
     void RenderTexture(SDL_Texture* tex, int x, int y,
-                       SDL_Rect* clip, SDL_Renderer* ren) {
+                       SDL_Rect* clip, SDL_Renderer* ren,
+                       double degree, SDL_RendererFlip flip) {
         SDL_Rect dst;
         dst.x = x;
         dst.y = y;
@@ -100,7 +113,7 @@ namespace muser::windows {
         } else {
             SDL_QueryTexture(tex, nullptr, nullptr, &dst.w, &dst.h);
         }
-        RenderTexture(tex, dst, clip, ren);
+        RenderTexture(tex, dst, clip, ren, degree, flip);
     }
 
     /**
@@ -118,20 +131,21 @@ namespace muser::windows {
     *		default of nullptr draws the entire texture
     */
     void RenderTexture(SDL_Texture* tex, int x, int y, int w, int h,
-                       SDL_Rect* clip, SDL_Renderer* ren) {
+                       SDL_Rect* clip, SDL_Renderer* ren,
+                       double degree, SDL_RendererFlip flip) {
         SDL_Rect dst;
         dst.x = x;
         dst.y = y;
-        dst.w = w == STRETCH_SCREEN_SIZE ? kScreenWidth : w;
-        dst.h = h == STRETCH_SCREEN_SIZE ? kScreenHeight : h;
+        dst.w = w == STRETCH_SCREEN_SIZE ? kWindowWidth : w;
+        dst.h = h == STRETCH_SCREEN_SIZE ? kWindowHeight : h;
         if (clip != nullptr) {
             dst.w = w == TEXTURE_SIZE ? clip->w : dst.w;
             dst.h = h == TEXTURE_SIZE ? clip->h : dst.h;
         } else {
             SDL_QueryTexture(tex, nullptr, nullptr,
-                w == TEXTURE_SIZE ? &dst.w : nullptr, h == TEXTURE_SIZE ? &dst.h : nullptr);
+                             w == TEXTURE_SIZE ? &dst.w : nullptr, h == TEXTURE_SIZE ? &dst.h : nullptr);
         }
-        RenderTexture(tex, dst, clip, ren);
+        RenderTexture(tex, dst, clip, ren, degree, flip);
     }
 
 }  // namespace muser::windows
