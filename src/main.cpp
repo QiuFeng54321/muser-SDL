@@ -18,6 +18,7 @@ int main(int argc, char* args[]) {
     muser::logger::init_logger();
     muser::logger::logger->info("You are running MuserSDL v{0}", MUSER_VERSION);
 
+    muser::windows::Init();
     muser::windows::CreateMuserWindow();
     muser::windows::CreateMuserRenderer();
 
@@ -27,11 +28,10 @@ int main(int argc, char* args[]) {
 
     muser::preference::InitPreferences();
 
-    constexpr muser::windows::CenteredMarginS<160, 32> TextureDim;
+    constexpr muser::windows::CenteredMarginS<80, 16> TextureDim;
     muser::logger::logger->warn("{}, {}", TextureDim.x, TextureDim.y);
 
     auto texture = muser::windows::UploadToTexture(muser::resource::GetSurface("muser_resources.bmp"));
-    SDL_SetTextureColorMod(texture, 64, 64, 64);
 
     SDL_Event e;
     bool quit = false;
@@ -62,7 +62,26 @@ int main(int argc, char* args[]) {
         alpha_g = muser::util::constrain(alpha_g, 0, 255);
         alpha_b = muser::util::constrain(alpha_b, 0, 255);
         SDL_SetTextureColorMod(texture, alpha_r, alpha_g, alpha_b);
-        muser::windows::RenderTexture(texture, TextureDim.x, TextureDim.y, 160, 32, new SDL_Rect{0, 64, 80, 16});
+        using namespace muser::windows;
+        //Make a target texture to render too
+        SDL_Texture* texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                                   SDL_TEXTUREACCESS_TARGET, kWindowWidth, kWindowHeight);
+
+        //Now render to the texture
+        SDL_SetRenderTarget(renderer, texTarget);
+        SDL_RenderClear(renderer);
+        muser::windows::RenderTexture(texture,
+                                      TextureDim.x, TextureDim.y,
+                                      TextureDim.width, TextureDim.height,
+                                      new SDL_Rect{0, 64, 80, 16},
+                                      muser::windows::renderer,
+                                      0);
+        //Detach the texture
+        SDL_SetRenderTarget(renderer, NULL);
+        
+        muser::windows::RenderTexture(texTarget,
+                                      muser::windows::display_map_x, muser::windows::display_map_y,
+                                      muser::windows::display_map_size, muser::windows::display_map_size);
         SDL_RenderPresent(muser::windows::renderer);
         SDL_Delay(50);
     }
