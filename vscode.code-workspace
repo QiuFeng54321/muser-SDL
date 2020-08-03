@@ -91,7 +91,8 @@
 			"string_view": "cpp",
 			"cinttypes": "cpp",
 			"charconv": "cpp",
-			"bitset": "cpp"
+			"bitset": "cpp",
+			"queue": "cpp"
 		}
 	}
 }

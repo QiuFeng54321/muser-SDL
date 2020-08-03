@@ -23,6 +23,8 @@ namespace muser::windows {
     void Init();
     int CreateMuserWindow();
     int CreateMuserRenderer();
+    int SetRenderTarget(SDL_Texture* texture);
+    int ResetRenderTarget();
     /**
      * @brief Loads bmp file from a path
      * 
@@ -31,7 +33,7 @@ namespace muser::windows {
      */
     SDL_Surface* LoadBMP(std::string path);
     SDL_Texture* UploadToTexture(SDL_Surface* bmp);
-    void RenderTexture(SDL_Texture* tex, SDL_Rect dst,
+    void RenderTexture(SDL_Texture* tex, SDL_Rect* dst,
                        SDL_Rect* clip = nullptr, SDL_Renderer* ren = renderer, double degree = 0.0, SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE);
     void RenderTexture(SDL_Texture* tex, int x = 0, int y = 0,
                        SDL_Rect* clip = nullptr, SDL_Renderer* ren = renderer, double degree = 0.0, SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE);

@@ -9,7 +9,7 @@ namespace muser::resource {
         const char* start;
         len_t length;
     };
-    extern std::map<std::string, ResourceEntry> resources;
+    extern std::map<std::string_view, ResourceEntry> resources;
     void InitResources();
 }
 #endif

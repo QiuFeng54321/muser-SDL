@@ -1,27 +1,36 @@
 #include "preference.hpp"
 
 namespace muser::preference {
-    toml::table main_pref;
+    Preference main_pref, sprite_clips;
     constexpr std::string_view main_pref_path = "preference_main.toml";
-    void InitPreferences() {
+    constexpr std::string_view sprite_clips_path = "preference_sprite_clips.toml";
+    Preference InitPreference(const std::string_view& store_path, const std::string_view& entry_path) {
         std::ifstream in;
         in.open(main_pref_path.data());
-        auto embed_data_entry = resource::GetResource("pref/main.toml");
+        auto entry = resource::GetResource(entry_path);
         if(!in) {
-            main_pref = toml::parse(std::string_view{embed_data_entry.start, embed_data_entry.length});
+            return {store_path, toml::parse(std::string_view{entry.start, entry.length})};
         } else {
-            main_pref = toml::parse(in);
+            return {store_path, toml::parse(in)};
         }
     }
-    void SavePreferences() {
-        std::ofstream out(main_pref_path.data());
-        out << main_pref;
+    void SavePreference(Preference& pref) {
+        std::ofstream out(pref.store_path.data());
+        out << pref.pref;
         out.close();
     }
+    void InitPreferences() {
+        main_pref = InitPreference(main_pref_path, "pref/main.toml");
+        sprite_clips = InitPreference(sprite_clips_path, "pref/sprites.toml");
+    }
+    void SavePreferences() {
+        SavePreference(main_pref);
+        SavePreference(sprite_clips);
+    }
     int GetBasicControl(std::string_view key) {
-        return main_pref["control"]["basic"][key].as_integer()->get();
+        return main_pref.pref["control"]["basic"][key].as_integer()->get();
     }
     int GetGameplayControl(int index) {
-        return main_pref["control"]["gameplay"][index].as_integer()->get();
+        return main_pref.pref["control"]["gameplay"][index].as_integer()->get();
     }
 }

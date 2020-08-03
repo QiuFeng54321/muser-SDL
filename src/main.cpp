@@ -71,7 +71,7 @@ int main(int argc, char* args[]) {
                                                    muser::windows::kWindowWidth, muser::windows::kWindowHeight);
 
         //Now render to the texture
-        SDL_SetRenderTarget(muser::windows::renderer, texTarget);
+        muser::windows::SetRenderTarget(texTarget);
         SDL_RenderClear(muser::windows::renderer);
         // ------------------------ Start rendering the texture ------------------------ //
         muser::windows::RenderTexture(texture,
@@ -82,7 +82,7 @@ int main(int argc, char* args[]) {
                                       0);
         // ------------------------ Stop rendering the texture  ------------------------ //
         // Detach the texture
-        SDL_SetRenderTarget(muser::windows::renderer, NULL);
+        muser::windows::ResetRenderTarget();
         // Render whole texture scaled to the displayer
         muser::windows::RenderTexture(texTarget,
                                       muser::windows::display_map_x, muser::windows::display_map_y,

@@ -1,4 +1,5 @@
-#include <windows.hpp>
+#include "windows.hpp"
+#include "sprite.hpp"
 
 namespace muser::windows {
     SDL_Window* window = nullptr;
@@ -46,6 +47,14 @@ namespace muser::windows {
         return 0;
     }
 
+    int SetRenderTarget(SDL_Texture* texture) {
+        return SDL_SetRenderTarget(renderer, texture);
+    }
+
+    int ResetRenderTarget() {
+        return SDL_SetRenderTarget(renderer, nullptr);
+    }
+
     /**
      * @brief Uses SDL_LoadBMP to load a bmp file into an SDL_Surface*
      * Prints error and quits if fail
@@ -83,10 +92,10 @@ namespace muser::windows {
     * @param clip The sub-section of the texture to draw (clipping rect)
     *		default of nullptr draws the entire texture
     */
-    void RenderTexture(SDL_Texture* tex, SDL_Rect dst,
+    void RenderTexture(SDL_Texture* tex, SDL_Rect* dst,
                        SDL_Rect* clip, SDL_Renderer* ren,
                        double degree, SDL_RendererFlip flip) {
-        SDL_RenderCopyEx(ren, tex, clip, &dst, degree, nullptr, flip);
+        SDL_RenderCopyEx(ren, tex, clip, dst, degree, nullptr, flip);
     }
 
     /**
@@ -104,14 +113,14 @@ namespace muser::windows {
     void RenderTexture(SDL_Texture* tex, int x, int y,
                        SDL_Rect* clip, SDL_Renderer* ren,
                        double degree, SDL_RendererFlip flip) {
-        SDL_Rect dst;
-        dst.x = x;
-        dst.y = y;
+        SDL_Rect *dst = new SDL_Rect;
+        dst->x = x;
+        dst->y = y;
         if (clip != nullptr) {
-            dst.w = clip->w;
-            dst.h = clip->h;
+            dst->w = clip->w;
+            dst->h = clip->h;
         } else {
-            SDL_QueryTexture(tex, nullptr, nullptr, &dst.w, &dst.h);
+            SDL_QueryTexture(tex, nullptr, nullptr, &dst->w, &dst->h);
         }
         RenderTexture(tex, dst, clip, ren, degree, flip);
     }
@@ -133,18 +142,8 @@ namespace muser::windows {
     void RenderTexture(SDL_Texture* tex, int x, int y, int w, int h,
                        SDL_Rect* clip, SDL_Renderer* ren,
                        double degree, SDL_RendererFlip flip) {
-        SDL_Rect dst;
-        dst.x = x;
-        dst.y = y;
-        dst.w = w == STRETCH_SCREEN_SIZE ? kWindowWidth : w;
-        dst.h = h == STRETCH_SCREEN_SIZE ? kWindowHeight : h;
-        if (clip != nullptr) {
-            dst.w = w == TEXTURE_SIZE ? clip->w : dst.w;
-            dst.h = h == TEXTURE_SIZE ? clip->h : dst.h;
-        } else {
-            SDL_QueryTexture(tex, nullptr, nullptr,
-                             w == TEXTURE_SIZE ? &dst.w : nullptr, h == TEXTURE_SIZE ? &dst.h : nullptr);
-        }
+        SDL_Rect* dst = new SDL_Rect{x, y, w, h};
+        sprite::Clip::ReplaceUniqueDimension(tex, dst, clip);
         RenderTexture(tex, dst, clip, ren, degree, flip);
     }
 
