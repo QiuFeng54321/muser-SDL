@@ -18,6 +18,9 @@ namespace muser::sprite {
         double degree = 0;
         SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE;
 
+        Clip(SDL_Texture* texture = nullptr, SDL_Rect* clip_region = nullptr, SDL_Rect* dest_region = nullptr,
+             double degree = 0, SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE);
+
         /**
          * @brief Draws the clip(texture)
          * @note (x, y) can be in any quadrant, since as a sprite comes out from border its coord can be negative.

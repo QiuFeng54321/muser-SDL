@@ -9,6 +9,11 @@ namespace muser::sprite {
         return GetCenterMargin(windows::kWindowCenterX, windows::kWindowCenterY, w, h);
     }
 
+    Clip::Clip(SDL_Texture* texture, SDL_Rect* clip_region, SDL_Rect* dest_region,
+             double degree, SDL_RendererFlip flip)
+             : texture(texture), clip_region(clip_region), dest_region(dest_region), 
+               degree(degree), flip(flip) {};
+
     Clip Clip::FromClips(Clip* clips, std::size_t size, SDL_Rect* texture_size) {
         Clip res;
         res.texture = SDL_CreateTexture(windows::renderer, SDL_PIXELFORMAT_RGBA8888,
@@ -31,6 +36,7 @@ namespace muser::sprite {
      * @note In this function, dest_region->x and dest_region_y are used as a buffer, \
      * so we don't have to allocate a new SDL_Rect*, \
      * which means if directly use windows::RenderTexture from somewhere else, the coord will be that of the last drawn.
+     * Thus, don't use factory method FromClips with clips that have already been drawn.
      * 
      * @param x X coord to be drawn at
      * @param y Y coord to be drawn at

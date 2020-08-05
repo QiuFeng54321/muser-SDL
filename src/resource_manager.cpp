@@ -3,7 +3,7 @@
 namespace muser::resource {
     std::map<std::string_view, std::string_view> temp_file_map;
     std::map<std::string_view, SDL_Surface*> surface_buffer;
-    bool enable_temp_file = true;
+    bool enable_temp_file = false;
 
     ResourceEntry GetResource(const std::string_view &file_path, const ResourceEntry &fallback) {
         // Returns the resource data given the resource path
@@ -31,6 +31,7 @@ namespace muser::resource {
     }
 
     void LoadResourcesToTempFiles() {
+        if (!enable_temp_file) return;
         for (auto pair : resources) {
             LoadResourceToTempFile(pair.first, pair.second);
         }

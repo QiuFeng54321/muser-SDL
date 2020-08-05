@@ -2,6 +2,8 @@
 fps = 60
 full_screen = false
 music_offset = 0
+sprites_source = "embedded"
+sprites = "pref/sprites.toml"
 
 [control]
 gameplay = [
