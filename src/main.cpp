@@ -39,7 +39,7 @@ int main(int argc, char* args[]) {
     SDL_Event e;
     bool quit = false;
     auto quit_key = muser::preference::GetBasicControl("quit");
-    int alpha_r = 0, alpha_g = 0, alpha_b = 0;
+    int alpha_r = 0, alpha_g = 0, alpha_b = 0, degree = 0;
     while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -61,6 +61,7 @@ int main(int argc, char* args[]) {
         } else if (alpha_b < 255) {
             alpha_b += 16;
         }
+        degree += 1;
         alpha_r = muser::util::constrain(alpha_r, 0, 255);
         alpha_g = muser::util::constrain(alpha_g, 0, 255);
         alpha_b = muser::util::constrain(alpha_b, 0, 255);
@@ -79,7 +80,7 @@ int main(int argc, char* args[]) {
                                       TextureDim.width, TextureDim.height,
                                       new SDL_Rect{0, 48, 80, 16},
                                       muser::windows::renderer,
-                                      0);
+                                      degree);
         // ------------------------ Stop rendering the texture  ------------------------ //
         // Detach the texture
         muser::windows::ResetRenderTarget();
