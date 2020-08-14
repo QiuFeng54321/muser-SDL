@@ -2,6 +2,8 @@
 #define SPRITE_HPP
 
 #include "SDL.h"
+#include "util.hpp"
+#include <list>
 
 namespace muser::sprite {
     SDL_Rect* GetCenterMargin(int x, int y, int w, int h);
@@ -55,8 +57,9 @@ namespace muser::sprite {
          * @return Clip created
          */
         static Clip FromClips(Clip* clips, std::size_t size, SDL_Rect* texture_size);
-    };
 
+        static Clip FromClips(std::list<Clip> clips, SDL_Rect* texture_size);
+    };
 }  // namespace muser::sprite
 
 #endif

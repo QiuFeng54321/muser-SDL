@@ -14,6 +14,9 @@
 # -  0: Texture original size (clip size), 0, 0, 0, 0
 # deg is degree and flip is enum SDL_RendererFlip
 # Flip values: {None = 0, Horizontal = 1, vertical = 2, both = 3}
+
+sprite_path_type = "embed"
+sprite_path = "muser_resources.bmp"
 arrows = [
     [1, 1, 6, 6, 0, 0, 0, 0],
     [1, 1, 6, 6, 0, 0, 0, 1],

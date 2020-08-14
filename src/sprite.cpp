@@ -23,6 +23,23 @@ namespace muser::sprite {
             windows::RenderTexture(clips[i].texture, clips[i].dest_region, clips[i].clip_region,
                                    windows::renderer, clips[i].degree, clips[i].flip);
         }
+        // Call this after all calls of FromClips is done!
+        // >>> windows::ResetRenderTarget();
+        res.clip_region = texture_size;
+        // Default - No scaling
+        res.dest_region = res.clip_region;
+        return res;
+    }
+
+    Clip Clip::FromClips(std::list<Clip> clips, SDL_Rect* texture_size) {
+        Clip res;
+        res.texture = SDL_CreateTexture(windows::renderer, SDL_PIXELFORMAT_RGBA8888,
+                                        SDL_TEXTUREACCESS_TARGET, texture_size->w, texture_size->h);
+        windows::SetRenderTarget(res.texture);
+        for (const auto& clip : clips) {
+            windows::RenderTexture(clip.texture, clip.dest_region, clip.clip_region,
+                                   windows::renderer, clip.degree, clip.flip);
+        }
         // Call this after all calls of FromClips or FromClip has done!
         // >>> windows::ResetRenderTarget();
         res.clip_region = texture_size;
